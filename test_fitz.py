@@ -1,26 +1,28 @@
-# apt-get install mupdf
-# apt-get install libmupdf-dev # Fixes : fatal error: fitz.h: No such file or directory 
-# sudo apt-get install libfreetype6-dev # Fixes : fatal error: ft2build.h: No such file or directory
-# sudo apt-get install mupdf-tools # Testing fix : Block of warnings warning: ‘jm_tracedraw_clip_path’ defined but not used [-Wunused-function]
-# pip install PyMuPDF
-
+# pip install pymupdf
 
 # https://stackabuse.com/working-with-pdfs-in-python-reading-and-splitting-pages
 import fitz
+import sys
 
 pdf_document = 'balsamic-glazed-pork-chops-608c0c893880cd71414ad1fa-d132ae7b.pdf' 
 
-page = 0
+doc = fitz.open(pdf_document)
+# print(f"number of pages: {doc.pageCount}")
+# print(f"{doc.metadata}")
 
-for image in pdf_document.getPageImageList(page):
-    xref = image[0]
-    pix = fitz.Pixmap(pdf_document, xref)
-    if pix.n < 5: # This is GRAY or RGB
-        filename = f"page{current_page}-{xref}.png"
-        pix.writePNG(filename)
-    else:
-        pix1 = fitz.Pixmap(fitz.csRGB, pix)
-        filename = f"page{current_page}-{xref}.png"
-        pix1.writePNG(filename)
-        pix1 = None
-    pix = None
+page1 = doc.loadPage(0)
+page1text = page1.getText("text")
+# print(f"{page1text}")
+
+for current_page in range(len(doc)):
+	for image in doc.getPageImageList(current_page):
+		xref = image[0]
+		pix = fitz.Pixmap(doc, xref)
+		if pix.width > 1000:
+			if pix.n == 4:
+				# Greyscale - 1 or 2 bytes per pixel
+				# RGB - 3 bytes per pixel
+				# CMYK - 4 bytes per pixel (Convert to RGB)
+				pix = fitz.Pixmap(fitz.csRGB, pix)
+			pix.writePNG("page%s-%s.png" % (current_page, xref))
+			pix = None
