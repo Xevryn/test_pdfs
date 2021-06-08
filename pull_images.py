@@ -13,30 +13,27 @@ if __name__ == '__main__':
 
         for obj in xObject:
             if xObject[obj]['/Subtype'] == '/Image':
-                size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
-                data = xObject[obj].getData()
-                for i in xObject[obj]:
-                   print(f"{i} : {xObject[obj][i]}")
-                # print(f"")
-                # print(f"{data}")
-                if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
-                    mode = "RGB"
-                else:
-                    mode = "P"
-                    #mode = "CMYK"
-                    #mode = 'RGB'
+                if xObject[obj]['/Width'] > 1000:
+                    size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
+                    data = xObject[obj].getData()
+                    for i in xObject[obj]:
+                       print(f"{i} : {xObject[obj][i]}")
+                    if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
+                        mode = "RGB"
+                    else:
+                        mode = "P"
 
-                if xObject[obj]['/Filter'] == '/FlateDecode':
-                    img = Image.frombytes(mode, size, data)
-                    img.save(obj[1:] + ".png")
-                elif xObject[obj]['/Filter'] == '/DCTDecode':
-                    img = open(obj[1:] + ".jpg", "wb")
-                    img.write(data)
-                    img.close()
-                elif xObject[obj]['/Filter'] == '/JPXDecode':
-                    img = open(obj[1:] + ".jp2", "wb")
-                    img.write(data)
-                    img.close()
+                    if xObject[obj]['/Filter'] == '/FlateDecode':
+                        img = Image.frombytes(mode, size, data)
+                        img.save(obj[1:] + ".png")
+                    elif xObject[obj]['/Filter'] == '/DCTDecode':
+                        img = open(obj[1:] + ".jpg", "wb")
+                        img.write(data)
+                        img.close()
+                    elif xObject[obj]['/Filter'] == '/JPXDecode':
+                        img = open(obj[1:] + ".jp2", "wb")
+                        img.write(data)
+                        img.close()
 
 
 # 3
